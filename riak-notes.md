@@ -152,7 +152,9 @@ You can remove nodes from the cluster, too.  `dev4/bin/riak-admin cluster remove
 
 ### Talking to Riak over HTTP
 
-Riak is running on port 10018.  We can run `curl -i "http://localhost:10018"` on the machine we're running on to get some potentially useful information!
+We can talk to our five nodes on ports 10018, 10028, 10038, 10048, and 10058.  (I don't know  how many nodes this naming convention would goes on for.)
+
+We can run `curl -i "http://localhost:10018"` on the machine we're running Riak on to get some potentially useful information!
 
 We can also grab a particular bucket and key.
 
