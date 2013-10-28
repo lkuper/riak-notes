@@ -171,3 +171,29 @@ We get a "204 No Content" response -- but we can configure it to give it the thi
 Now we can try our get again with `curl -i "http://localhost:10018/buckets/classroom/keys/teacher"`.  Heyyyy, there it is.
 
 And we can delete with `curl -i -X DELETE`.  Aaaaand it's gone.
+
+## What is Riak good and not good for?
+
+"Not every solution looks like a key-value solution."
+
+Possible approaches to using Riak: key-value, map-reduce, secondary indexes, search.
+
+What are your data access patterns?  Scheduled, or spontaneous?  Static, or dynamic? (Do you just need to grab what's in a fixed location, or will you have to compute with what you get back?)
+
+For *scheduled, static* problems, like "I want to export the .csv files every day at 8am, and there are always 20 of them and they're always 50MB", key-value and map-reduce work well.
+
+For *spontaneous, static* problems, like storing sessions and caches, key-value works well.
+
+For *scheduled, dynamic* problems, like generating the aforementioned .csv files, map-reduce, secondary indexes, and search work well.
+
+For *spontaneous, dynamic* problems, Riak isn't so great.  Relational databases, full-text search, graph databases, time series databases, and realtime map-reduce are better.
+
+Most database problems will, at least superficially, be the last of these.  So, why are we here?  Because it turns out that a lot of supposedly *spontaneous, dynamic* problems can be recast as *spontaneous, static* ones.  This is often a matter of figuring out what can be precomputed.  It's "totally tractable", but requires a different way of thinking about the problem.  "Think about the questions you need to ask of the data before you put it in."
+
+"Well, isn't the problem that you often come up with the questions after you have the data?"  "...yeah."
+
+We can also use Riak in combination with other things.  E.g., Neo4j is a great graph database, but doesn't scale particularly well, so we could use Neo4j as a graph database and then have static documents hanging off it (or something) with Riak.  Generally speaking, Riak will work really well for your "more static" stuff.
+
+...also, the hope is that Riak 2.0 will be better at the stuff that Riak 1.4 isn't so great at.
+
+And, after all, schema changes suck in SQL systems -- we don't have to deal with that!
