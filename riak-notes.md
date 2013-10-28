@@ -127,3 +127,45 @@ OK, here we go.
 Enable siblings, and then, rather than storing both values, have a resolution mechanism.  If your resolution mechanism -- that you write yourself! -- actually computes a least upper bound (my words, not theirs) -- then you'll have a CRDT.  But, in Riak 2.0 (coming in December?), you won't have to worry about that because more CRDTs will be built in (counters, etc.).
 
 "We have institutional knowledge about the good and bad things to do with a SQL database.  We don't know that stuff as well yet for NoSQL databases."
+
+## Playing around with Riak
+
+Download and unpack the riak-1.4.2 tarball and `make devrel`.  This will create a 5-node instance of Riak.
+
+`cd dev`, and in there you'll find five dev nodes.
+
+### Inside a node
+
+Your data lives in `data`.
+
+Riak bundles its own version of Erlang, which is in the `erts-5.9.1` directory inside a node.  (It's mostly the same as Ericsson's official version, except for some stuff that Ericsson didn't care about fixing?)
+
+In `bin`, `riak-admin` is what we use to manage the cluster; `riak` is what we use to start our node up. `riak start` will start the node; we can `riak ping` it and it'll respond with "pong".  Let's `riak start` all five of the nodes.
+
+Now, they're all running, but they don't know about each other.  For each N = [1..5], running `devN/bin/riak-admin member status` will tell us that that node is 100% of the ring.
+
+But we can join, say, dev1 to dev5 by running `dev1/bin/riak-admin cluster join dev5@127.0.0.1`.  Join each node to dev5.  This will *stage* the changes.  Then we have to `riak-admin cluster plan` and `riak-admin cluster commit`.
+
+`riak-admin cluster member status` and `riak-admin ring status` are also useful.
+
+You can remove nodes from the cluster, too.  `dev4/bin/riak-admin cluster remove dev5@127.0.0.1` will tell dev4 to leave dev5.  (You could just as easily tell dev4 to leave dev1.)
+
+### Talking to Riak over HTTP
+
+Riak is running on port 10018.  We can run `curl -i "http://localhost:10018"` on the machine we're running on to get some potentially useful information!
+
+We can also grab a particular bucket and key.
+
+`curl -i "http://localhost:10018/buckets/classroom/keys/teacher"`
+
+This'll give us a "not found", since we haven't saved anything there!
+
+OK, let's actually do a PUT:
+
+`curl -i -X PUT "http://localhost:10018/buckets/classroom/keys/teacher" -d "Nathan"`
+
+We get a "204 No Content" response -- but we can configure it to give it the thing we just put, if we want.
+
+Now we can try our get again with `curl -i "http://localhost:10018/buckets/classroom/keys/teacher"`.  Heyyyy, there it is.
+
+And we can delete with `curl -i -X DELETE`.  Aaaaand it's gone.
