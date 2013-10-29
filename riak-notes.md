@@ -172,6 +172,14 @@ Now we can try our get again with `curl -i "http://localhost:10018/buckets/class
 
 And we can delete with `curl -i -X DELETE`.  Aaaaand it's gone.
 
+###  How to configure Riak
+
+Inside a node's directory:
+
+  * `etc/app.config` is where all the stuff that configures Riak goes.  You can configure things like which ports we can talk to Riak on, where the data is stored, and tons of other stuff.  If you change something like the ring size, you have to change it in `app.config`, then stop the node, then start it again.  You can do this one node at a time, without taking your cluster down.
+
+  * `etc/vm.args` is where all the stuff that tunes Erlang goes.
+
 ## What is Riak good and not good for?
 
 "Not every solution looks like a key-value solution."
